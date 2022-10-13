@@ -13,7 +13,7 @@ class Deck(models.Model):
 class Field(models.Model):
 
     class DeckSide(models.TextChoices):
-        FACE = 'face', 'face'
+        FACE = 'front', 'front'
         BACK = 'back', 'back'
 
     class FieldType(models.TextChoices):
@@ -26,7 +26,7 @@ class Field(models.Model):
     type = models.CharField(max_length = 9, choices = FieldType.choices)
     fontSize = models.PositiveSmallIntegerField()
     deck = models.ForeignKey(Deck, related_name="fields", on_delete=models.CASCADE)
-
+    
     def __str__(self):
         return self.name
 
@@ -34,7 +34,7 @@ class Card(models.Model):
     deck = models.ForeignKey(Deck, related_name="cards", on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.name
+        return "Карта " + str(self.id)
 
 class Value(models.Model):
     field = models.ForeignKey(Field, related_name="values", on_delete=models.CASCADE)
@@ -42,4 +42,4 @@ class Value(models.Model):
     value = models.TextField()
 
     def __str__(self):
-        return self.name
+        return self.value

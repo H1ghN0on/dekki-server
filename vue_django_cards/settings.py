@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-!(q5g8qm@x3-egb1si_&)61q*r3$qo*-g@t17p5ohxikjbk*mg
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['containers-us-west-72.railway.app', '127.0.0.1']
+ALLOWED_HOSTS = ['containers-us-west-72.railway.app', '127.0.0.1', 'localhost']
 
 
 # Application definition
@@ -47,20 +47,22 @@ INSTALLED_APPS = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:8080'
+    'http://localhost:8080',
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
-    'corsheaders.middleware.CorsMiddleware'
 ]
+
+
 
 ROOT_URLCONF = 'vue_django_cards.urls'
 
@@ -112,6 +114,8 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+
 
 
 # Internationalization

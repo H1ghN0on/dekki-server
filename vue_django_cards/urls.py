@@ -5,5 +5,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('decks/', include("decks.urls")),
     path('auth/', include("djoser.urls")),
-    path("auth", include("djoser.urls.authtoken")),
+    path("auth/", include("djoser.urls.authtoken")),
 ]
