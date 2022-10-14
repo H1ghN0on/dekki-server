@@ -3,6 +3,7 @@ from rest_framework import serializers
 from .models import Deck, Field, Card, Value
 
 class FieldSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField()
     class Meta:
         model = Field
         fields = (
@@ -20,6 +21,7 @@ class ValueSerializer(serializers.ModelSerializer):
     class Meta:
         model = Value
         fields = (
+            "id",
             "field",
             "value",
         )
@@ -30,6 +32,7 @@ class CardSerializer(serializers.ModelSerializer):
     class Meta:
         model = Card
         fields = (
+            "id",
             "values",
         )
 
@@ -50,5 +53,7 @@ class DeckSerializer(serializers.ModelSerializer):
         )
 
 
-
-
+class AddToDeckSerializer(serializers.Serializer):
+    field_id = serializers.IntegerField()
+    value = serializers.CharField()
+    
