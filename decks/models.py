@@ -22,11 +22,11 @@ class Field(models.Model):
 
     side = models.CharField(max_length = 5, choices = DeckSide.choices)
     position = models.PositiveSmallIntegerField()
-    name = models.CharField(max_length = 255)
+    name = models.CharField(max_length = 255, blank = True)
     type = models.CharField(max_length = 9, choices = FieldType.choices)
     fontSize = models.PositiveSmallIntegerField()
-    deck = models.ForeignKey(Deck, related_name="fields", on_delete=models.CASCADE)
-    
+    deck = models.ForeignKey(Deck, related_name="fields", on_delete=models.CASCADE)   
+
     def __str__(self):
         return self.name
 
@@ -39,7 +39,7 @@ class Card(models.Model):
 class Value(models.Model):
     field = models.ForeignKey(Field, related_name="values", on_delete=models.CASCADE)
     card = models.ForeignKey(Card, related_name="values", on_delete=models.CASCADE)
-    value = models.TextField()
+    value = models.TextField(blank = True)
 
     def __str__(self):
         return self.value

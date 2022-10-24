@@ -18,6 +18,7 @@ class FieldSerializer(serializers.ModelSerializer):
 
 class ValueSerializer(serializers.ModelSerializer):
     field = FieldSerializer()
+    id = serializers.IntegerField()
     class Meta:
         model = Value
         fields = (
