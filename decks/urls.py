@@ -9,4 +9,5 @@ urlpatterns = [
     path('update/<slug:deck_slug>/<str:deck_name>/', views.updateDeckName),
     path('update/values/', views.updateDeckValues),
     path('update/fields/', views.updateDeckFields),
+    path('update/remove-cards/', views.removeDeckCards)
 ]

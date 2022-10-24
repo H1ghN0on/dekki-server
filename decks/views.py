@@ -10,7 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 
 from .models import Deck, Field, Value, Card
-from .serializers import DeckSerializer, AddToDeckSerializer, FieldSerializer, ValueSerializer
+from .serializers import CardSerializer, DeckSerializer, AddToDeckSerializer, FieldSerializer, ValueSerializer
 
 class MyDecks(APIView):
     permission_classes = [IsAuthenticated]
@@ -59,6 +59,21 @@ def updateDeckValues(request):
             value_id = value["id"]
             Value.objects.filter(id = value_id).update(value = new_value)
     return Response()
+
+
+@api_view(["POST"])
+@authentication_classes([authentication.TokenAuthentication])
+@permission_classes([permissions.IsAuthenticated])
+def removeDeckCards(request):
+    data = request.data.get('data')
+    
+    for id in data:
+        card = Card.objects.get(id = id)
+        card.delete()
+   
+    return Response()
+
+
 
 @api_view(["POST"])
 @authentication_classes([authentication.TokenAuthentication])
