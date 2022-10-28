@@ -42,6 +42,7 @@ class CardSerializer(serializers.ModelSerializer):
 class DeckSerializer(serializers.ModelSerializer):
     fields = FieldSerializer(many = True)
     cards = CardSerializer(many = True)
+   
     class Meta:
         model = Deck
         fields = (
@@ -51,6 +52,7 @@ class DeckSerializer(serializers.ModelSerializer):
             "slug",
             "fields",
             "cards",
+            "cards_number",
         )
 
 

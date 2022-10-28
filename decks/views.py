@@ -49,12 +49,22 @@ def createDeck(request, deck_name):
     )
     return Response(deck.slug)
 
+
+@api_view(["DELETE"])
+@authentication_classes([authentication.TokenAuthentication])
+@permission_classes([permissions.IsAuthenticated])
+def removeDeck(request, deck_slug):
+    Deck.objects.filter(slug=deck_slug).delete()
+    return Response()
+
 @api_view(["PUT"])
 @authentication_classes([authentication.TokenAuthentication])
 @permission_classes([permissions.IsAuthenticated])
 def updateDeckName(request, deck_name, deck_slug):
-    Deck.objects.filter(slug = deck_slug).update(name = deck_name)
-    return Response()
+    deck = Deck.objects.get(slug = deck_slug)
+    deck.name = deck_name
+    deck.save()
+    return Response(deck.slug)
 
 @api_view(["POST"])
 @authentication_classes([authentication.TokenAuthentication])

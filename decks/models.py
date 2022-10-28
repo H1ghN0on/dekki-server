@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models import Count
 
 from common.utils.unique_slugify import unique_slugify
 
@@ -11,6 +12,12 @@ class Deck(models.Model):
     def save(self, **kwargs):
         unique_slugify(self, self.name)
         super(Deck, self).save(**kwargs)
+
+
+    def cards_number(self):
+        cards_number = self.cards.count()
+        return cards_number
+        
 
     def __str__(self):
         return self.name
