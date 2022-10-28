@@ -38,6 +38,17 @@ class DeckDetails(APIView):
         return Response(serializer.data)
 
 
+@api_view(["GET"])
+@authentication_classes([authentication.TokenAuthentication])
+@permission_classes([permissions.IsAuthenticated])
+def createDeck(request, deck_name):
+    deck = Deck.objects.create(
+        name = deck_name,
+        user = request.user,
+
+    )
+    return Response(deck.slug)
+
 @api_view(["PUT"])
 @authentication_classes([authentication.TokenAuthentication])
 @permission_classes([permissions.IsAuthenticated])
@@ -86,6 +97,7 @@ def updateDeckFields(request):
     cards = Card.objects.filter(deck = deck)
     fields = Field.objects.filter(deck = deck)
     updatedFields = []
+   
     if (data_serializer.is_valid()):
         print(data_serializer.validated_data)
         for field in data_serializer.validated_data:

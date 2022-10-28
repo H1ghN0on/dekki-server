@@ -1,10 +1,16 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+from common.utils.unique_slugify import unique_slugify
+
 class Deck(models.Model):
     user = models.ForeignKey(User, related_name="decks", on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=255)
     slug = models.SlugField(max_length=255, unique=True)
+
+    def save(self, **kwargs):
+        unique_slugify(self, self.name)
+        super(Deck, self).save(**kwargs)
 
     def __str__(self):
         return self.name
