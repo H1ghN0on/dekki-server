@@ -195,11 +195,18 @@ def createTest(request, deck_slug):
         while len(random_values) != 3:
             random_card = random.choice(cards)
             if (random_card.id != known_card.id):
-                random_value = Value.objects.filter(card = random_card, field = random.choice(random_fields))  
-                random_values.add(random.choice(random_value))
+                random_value = Value.objects.filter(card = random_card, field = random.choice(random_fields))
+                one_random_value = random.choice(random_value)
+                if (one_random_value.value):
+                    random_values.add(random.choice(random_value))
                 
-        correct_values = Value.objects.filter(card = known_card, field = random.choice(random_fields))
-        correct_value = random.choice(correct_values)
+        correct_value = ""
+        while not correct_value:
+            correct_values = Value.objects.filter(card = known_card, field = random.choice(random_fields))
+            one_random_value = random.choice(correct_values)
+            if (one_random_value.value):
+                correct_value = random.choice(correct_values)
+        
 
         random_values.add(correct_value)
         random.shuffle(list(random_values))
