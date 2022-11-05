@@ -60,3 +60,15 @@ class AddToDeckSerializer(serializers.Serializer):
     field_id = serializers.IntegerField()
     value = serializers.CharField()
     
+
+
+
+
+
+
+class TestingSerializer(serializers.Serializer):
+    card = CardSerializer()
+    correct_answer = serializers.CharField()
+    side = serializers.CharField(max_length = 5)
+    answers = serializers.ListField(child = serializers.CharField(max_length = 255))
+    

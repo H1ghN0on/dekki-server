@@ -15,4 +15,5 @@ urlpatterns = [
     path('update/fields/', views.updateDeckFields),
     path('update/remove-cards/', views.removeDeckCards),
     path('remove/<str:deck_slug>/', views.removeDeck),
+    path('create-test/<str:deck_slug>/', views.createTest),
 ]

@@ -1,3 +1,7 @@
+import random
+
+
+from sqlite3 import DataError, OperationalError
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 
@@ -6,11 +10,10 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework import  authentication, permissions
 from rest_framework.permissions import IsAuthenticated
-
 from rest_framework.authentication import TokenAuthentication
 
 from .models import Deck, Field, Value, Card
-from .serializers import CardSerializer, DeckSerializer, AddToDeckSerializer, FieldSerializer, ValueSerializer
+from .serializers import  CardSerializer, DeckSerializer, AddToDeckSerializer, FieldSerializer, TestingSerializer, ValueSerializer
 
 class MyDecks(APIView):
     permission_classes = [IsAuthenticated]
@@ -20,6 +23,8 @@ class MyDecks(APIView):
         decks = Deck.objects.filter(user=request.user)
         serializer = DeckSerializer(decks, many = True)
         return Response(serializer.data)
+        
+            
     
 
 class DeckDetails(APIView):
@@ -163,3 +168,50 @@ def addToDeck(request):
             value = value_field["value"]
             Value.objects.create(field_id=field_id, card_id=card.id, value=value)
     return Response()
+
+
+@api_view(["GET"])
+@authentication_classes([authentication.TokenAuthentication])
+@permission_classes([permissions.IsAuthenticated])
+def createTest(request, deck_slug):
+    QUESTIONS_NUMBER = 100
+
+    deck = Deck.objects.get(slug = deck_slug)
+    cards  = Card.objects.filter(deck__slug = deck_slug)
+    test = list()
+    sides = ["front", "back"]
+
+    for i in range(0, QUESTIONS_NUMBER):
+        
+        random_side = random.choice(sides)
+        known_side  = "back" if random_side == "front" else "front"
+        known_card = random.choice(cards)
+  
+        random_fields = Field.objects.filter(deck = deck, side = known_side)
+
+        
+        random_values = set()
+   
+        while len(random_values) != 3:
+            random_card = random.choice(cards)
+            if (random_card.id != known_card.id):
+                random_value = Value.objects.filter(card = random_card, field = random.choice(random_fields))  
+                random_values.add(random.choice(random_value))
+                
+        correct_values = Value.objects.filter(card = known_card, field = random.choice(random_fields))
+        correct_value = random.choice(correct_values)
+
+        random_values.add(correct_value)
+        random.shuffle(list(random_values))
+       
+        test.append(
+            dict({
+                "correct_answer": correct_value,
+                "card": known_card,
+                "side": random_side,
+                "answers": random_values
+            })
+        )
+    
+    serializer = TestingSerializer(test, many=True)
+    return Response(serializer.data)
