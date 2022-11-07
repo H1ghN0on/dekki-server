@@ -49,9 +49,7 @@ INSTALLED_APPS = [
     'decks'
 ]
 
-CORS_ALLOWED_ORIGINS = [
-    'https://noon-decks.herokuapp.com',
-]
+CORS_ALLOWED_ORIGINS = str(os.getenv('CORS_ALLOWED')).split(" ")
 
 
 MIDDLEWARE = [
