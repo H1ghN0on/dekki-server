@@ -173,11 +173,11 @@ def addToDeck(request):
 @api_view(["GET"])
 @authentication_classes([authentication.TokenAuthentication])
 @permission_classes([permissions.IsAuthenticated])
-def createTest(request, deck_slug):
+def createTest(request, deck_slug, cards_number):
     QUESTIONS_NUMBER = 100
 
     deck = Deck.objects.get(slug = deck_slug)
-    cards  = Card.objects.filter(deck__slug = deck_slug)
+    cards  = Card.objects.filter(deck__slug = deck_slug).order_by("-id")[:cards_number][::-1]
     test = list()
     sides = ["front", "back"]
 
