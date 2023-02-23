@@ -50,7 +50,6 @@ def createDeck(request, deck_name):
     deck = Deck.objects.create(
         name = deck_name,
         user = request.user,
-
     )
     return Response(deck.slug)
 
@@ -158,7 +157,6 @@ def addToDeck(request):
     data = request.data.get('data')
     deck_slug = request.data.get("deck_slug")
     serializer = AddToDeckSerializer(data = data.get("values"), many=True)
-
     if (serializer.is_valid()):
         deck = get_object_or_404(Deck, slug = deck_slug)
         card = Card.objects.create(deck_id = deck.id)
@@ -173,23 +171,35 @@ def addToDeck(request):
 @api_view(["GET"])
 @authentication_classes([authentication.TokenAuthentication])
 @permission_classes([permissions.IsAuthenticated])
-def createTest(request, deck_slug, cards_number):
-    QUESTIONS_NUMBER = 100
-
+def copyDeckStructure(request, deck_slug, new_deck_name):
     deck = Deck.objects.get(slug = deck_slug)
-    cards  = Card.objects.filter(deck__slug = deck_slug).order_by("-id")[:cards_number][::-1]
-    test = list()
-    sides = ["front", "back"]
+    new_deck = Deck.objects.create(
+        name = new_deck_name,
+        user = request.user,
+    )
+    fields = Field.objects.filter(deck_id = deck.id)
+    for field in fields:
+        Field.objects.create(
+            side = field.side,
+            position =  field.position,
+            name =  field.name,
+            type = field.type,
+            fontSize =  field.fontSize,
+            deck_id = new_deck.id, 
+        )
+    serializer = DeckSerializer(new_deck)
+    return Response(serializer.data)
 
-    for i in range(0, QUESTIONS_NUMBER):
-        
+def generateTest(deck, cards, card_indices):
+    sides = ["front", "back"]
+    test = list()
+    for card_index in card_indices:
+
         random_side = random.choice(sides)
         known_side  = "back" if random_side == "front" else "front"
-        known_card = random.choice(cards)
-  
-        random_fields = Field.objects.filter(deck = deck, side = known_side)
 
-        
+        known_card = cards[card_index]
+        random_fields = Field.objects.filter(deck = deck, side = known_side)
         random_values = set()
    
         while len(random_values) != 3:
@@ -197,6 +207,7 @@ def createTest(request, deck_slug, cards_number):
             if (random_card.id != known_card.id):
                 random_value = Value.objects.filter(card = random_card, field = random.choice(random_fields))
                 one_random_value = random.choice(random_value)
+
                 if (one_random_value.value):
                     random_values.add(random.choice(random_value))
                 
@@ -218,7 +229,37 @@ def createTest(request, deck_slug, cards_number):
                 "side": random_side,
                 "answers": random_values
             })
-        )
-    
+        ) 
+    return test
+
+
+
+
+
+
+@api_view(["GET"])
+@authentication_classes([authentication.TokenAuthentication])
+@permission_classes([permissions.IsAuthenticated])
+def createExam(request, deck_slug):
+    deck = Deck.objects.get(slug = deck_slug)
+    cards  = Card.objects.filter(deck__slug = deck_slug)
+    indices = list(range(cards.count()))
+    random.shuffle(indices)
+    test = generateTest(deck, cards, indices)
+    serializer = TestingSerializer(test, many=True)
+    return Response(serializer.data)
+        
+
+
+@api_view(["GET"])
+@authentication_classes([authentication.TokenAuthentication])
+@permission_classes([permissions.IsAuthenticated])
+def createTest(request, deck_slug, cards_number):
+    QUESTIONS_NUMBER = 100
+    deck = Deck.objects.get(slug = deck_slug)
+    cards  = Card.objects.filter(deck__slug = deck_slug).order_by("-id")[:cards_number][::-1]
+    indices = [i % cards_number for i in list(range(QUESTIONS_NUMBER))]
+    random.shuffle(indices)
+    test = generateTest(deck, cards, indices)
     serializer = TestingSerializer(test, many=True)
     return Response(serializer.data)

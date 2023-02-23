@@ -59,13 +59,11 @@ class DeckSerializer(serializers.ModelSerializer):
 class AddToDeckSerializer(serializers.Serializer):
     field_id = serializers.IntegerField()
     value = serializers.CharField()
-    
 
-
-
-
-
-
+class CreateTestSerializer(serializers.Serializer):
+    cards_number = serializers.IntegerField()
+    deck_slug = serializers.SlugField()
+    is_exam = serializers.BooleanField()
 class TestingSerializer(serializers.Serializer):
     card = CardSerializer()
     correct_answer = serializers.CharField()

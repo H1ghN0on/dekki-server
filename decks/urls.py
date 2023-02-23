@@ -15,5 +15,7 @@ urlpatterns = [
     path('update/fields/', views.updateDeckFields),
     path('update/remove-cards/', views.removeDeckCards),
     path('remove/<str:deck_slug>/', views.removeDeck),
+    path('copy-deck-structure/<str:deck_slug>/<str:new_deck_name>', views.copyDeckStructure),
+    path('create-exam/<str:deck_slug>/', views.createExam),
     path('create-test/<str:deck_slug>/<int:cards_number>', views.createTest),
 ]
