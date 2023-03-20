@@ -258,8 +258,8 @@ def createTest(request, deck_slug, cards_number):
     QUESTIONS_NUMBER = 100
     deck = Deck.objects.get(slug = deck_slug)
     cards  = Card.objects.filter(deck__slug = deck_slug).order_by("-id")[:cards_number][::-1]
-    indices = [i % cards_number for i in list(range(QUESTIONS_NUMBER))]
+    indices = list(range(cards_number))
     random.shuffle(indices)
-    test = generateTest(deck, cards, indices)
+    test = generateTest(deck, cards, indices[0:QUESTIONS_NUMBER])
     serializer = TestingSerializer(test, many=True)
     return Response(serializer.data)
