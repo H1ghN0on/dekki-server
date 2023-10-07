@@ -13,7 +13,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 
 from .models import Deck, Field, Value, Card
-from .serializers import  CardSerializer, DeckSerializer, AddToDeckSerializer, FieldSerializer, TestingSerializer, ValueSerializer
+from .serializers import  CardSerializer, DeckSerializer, AddToDeckSerializer, \
+    FieldSerializer, TestingSerializer, ValueSerializer, QuestSerializer
 
 class MyDecks(APIView):
     permission_classes = [IsAuthenticated]
@@ -232,8 +233,28 @@ def generateTest(deck, cards, card_indices):
         ) 
     return test
 
+def generateQuest(deck, cards, card_indices):
+    sides = ["front", "back"]
+    test = list()
+    for card_index in card_indices:
+        random_side = random.choice(sides)
+        known_side  = "back" if random_side == "front" else "front"
 
+        known_card = cards[card_index]
+        random_fields = Field.objects.filter(deck = deck, side = known_side)
+        correct_values = Value.objects.filter(card = known_card, field__in = random_fields)
+        correct_values_arr = list()
+        for value in correct_values:
+            correct_values_arr.extend(value.value.split(", "))
 
+        test.append(
+            dict({
+                "card": known_card,
+                "side": random_side,
+                "answers": correct_values_arr
+            })
+        )
+    return test
 
 
 
@@ -262,4 +283,22 @@ def createTest(request, deck_slug, cards_number):
     random.shuffle(indices)
     test = generateTest(deck, cards, indices[0:QUESTIONS_NUMBER])
     serializer = TestingSerializer(test, many=True)
+    return Response(serializer.data)
+
+
+@api_view(["GET"])
+@authentication_classes([authentication.TokenAuthentication])
+@permission_classes([permissions.IsAuthenticated])
+def createQuest(request, deck_slug, cards_number, questions_limit):
+    questions_number = questions_limit
+    deck = Deck.objects.get(slug = deck_slug)
+
+    if (questions_number == 0):
+        questions_number = deck.cards_number()
+
+    cards  = Card.objects.filter(deck__slug = deck_slug).order_by("-id")[:cards_number][::-1]
+    indices = list(range(cards_number))
+    random.shuffle(indices)
+    test = generateQuest(deck, cards, indices[0:questions_number])
+    serializer = QuestSerializer(test, many=True)
     return Response(serializer.data)

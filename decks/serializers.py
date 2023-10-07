@@ -70,3 +70,8 @@ class TestingSerializer(serializers.Serializer):
     side = serializers.CharField(max_length = 5)
     answers = serializers.ListField(child = serializers.CharField(max_length = 255))
     
+class QuestSerializer(serializers.Serializer):
+    card = CardSerializer()
+    side = serializers.CharField(max_length = 5)
+    answers = serializers.ListField(child = serializers.CharField(max_length = 255))
+    

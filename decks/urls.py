@@ -18,4 +18,5 @@ urlpatterns = [
     path('copy-deck-structure/<str:deck_slug>/<str:new_deck_name>', views.copyDeckStructure),
     path('create-exam/<str:deck_slug>/', views.createExam),
     path('create-test/<str:deck_slug>/<int:cards_number>', views.createTest),
+    path('create-quest/<str:deck_slug>/<int:cards_number>/<int:questions_limit>', views.createQuest),
 ]
