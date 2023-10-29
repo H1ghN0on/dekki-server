@@ -1,15 +1,17 @@
 {
-    "builds": [
-      {
-        "src": "vue_django_cards/wsgi.py",
-        "use": "@vercel/python"
-      }
-    ],
-    "routes": [
-      {
-        "src": "/(.*)",
-        "dest": "vue_django_cards/wsgi.py"
-      }
-    ],
-    "installCommand": "pip install -r requirements.txt"
+  "builds": [
+    {
+      "src": "vue_django_cards/wsgi.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "vue_django_cards/wsgi.py"
+    }
+  ],
+  "exclude": [
+    "psycopg2"
+  ]
 }
