@@ -10,5 +10,5 @@
       "src": "/(.*)",
       "dest": "vue_django_cards/wsgi.py"
     }
-  ],
+  ]
 }
