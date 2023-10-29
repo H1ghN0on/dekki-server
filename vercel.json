@@ -11,7 +11,4 @@
       "dest": "vue_django_cards/wsgi.py"
     }
   ],
-  "exclude": [
-    "psycopg2"
-  ]
 }
