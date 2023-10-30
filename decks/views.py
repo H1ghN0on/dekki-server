@@ -1,3 +1,4 @@
+from itertools import islice
 import random
 
 
@@ -14,7 +15,7 @@ from rest_framework.authentication import TokenAuthentication
 
 from .models import Deck, Field, Value, Card
 from .serializers import  CardSerializer, DeckSerializer, AddToDeckSerializer, \
-    FieldSerializer, TestingSerializer, ValueSerializer, QuestSerializer
+    FieldSerializer, TestingSerializer, ValueSerializer, QuestSerializer, DeckInfoSerializer
 
 class MyDecks(APIView):
     permission_classes = [IsAuthenticated]
@@ -22,7 +23,7 @@ class MyDecks(APIView):
 
     def get(self, request):
         decks = Deck.objects.filter(user=request.user)
-        serializer = DeckSerializer(decks, many = True)
+        serializer = DeckInfoSerializer(decks, many = True)
         return Response(serializer.data)
         
             
@@ -41,6 +42,22 @@ class DeckDetails(APIView):
     def get(self, request, deck_slug):
         deck = self.get_object(deck_slug)
         serializer = DeckSerializer(deck)
+                
+        return Response(serializer.data)
+
+class DeckDetailsInfo(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = (TokenAuthentication,)
+
+    def get_object(self, deck_slug):    
+        try:
+            return Deck.objects.get(slug=deck_slug)
+        except Deck.DoesNotExist:
+            raise Http404
+
+    def get(self, request, deck_slug):
+        deck = self.get_object(deck_slug)
+        serializer = DeckInfoSerializer(deck)
         return Response(serializer.data)
 
 

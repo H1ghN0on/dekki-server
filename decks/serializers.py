@@ -54,7 +54,16 @@ class DeckSerializer(serializers.ModelSerializer):
             "cards",
             "cards_number",
         )
-
+        
+class DeckInfoSerializer(serializers.ModelSerializer):   
+    class Meta:
+        model = Deck
+        fields = (
+            "id",
+            "name",
+            "slug",
+            "cards_number",
+        )
 
 class AddToDeckSerializer(serializers.Serializer):
     field_id = serializers.IntegerField()

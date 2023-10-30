@@ -8,6 +8,7 @@ from decks import views
 urlpatterns = [
     path('get-my/', views.MyDecks.as_view()),
     path('get/<str:deck_slug>/', views.DeckDetails.as_view()),
+    path('get/info/<str:deck_slug>/', views.DeckDetailsInfo.as_view()),
     path('add/', views.addToDeck),
     path('add-new/<str:deck_name>/', views.createDeck),
     path('update/<str:deck_slug>/<str:deck_name>/', views.updateDeckName),
