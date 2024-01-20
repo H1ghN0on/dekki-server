@@ -1,6 +1,6 @@
 from itertools import islice
 import random
-
+import re
 
 from sqlite3 import DataError, OperationalError
 from django.http import Http404
@@ -208,13 +208,17 @@ def copyDeckStructure(request, deck_slug, new_deck_name):
     serializer = DeckSerializer(new_deck)
     return Response(serializer.data)
 
-def generateTest(deck, cards, card_indices):
+def generateTest(deck, cards, card_indices, side = ""):
     sides = ["front", "back"]
     test = list()
-    for card_index in card_indices:
 
-        random_side = random.choice(sides)
-        known_side  = "back" if random_side == "front" else "front"
+    random_side = "back" if side == "front" else "front"
+    known_side = side
+
+    for card_index in card_indices:
+        if side == "":
+            random_side = random.choice(sides)
+            known_side  = "back" if random_side == "front" else "front"
 
         known_card = cards[card_index]
         random_fields = Field.objects.filter(deck = deck, side = known_side)
@@ -250,19 +254,22 @@ def generateTest(deck, cards, card_indices):
         ) 
     return test
 
-def generateQuest(deck, cards, card_indices):
+def generateQuest(deck, cards, card_indices, side = ""):
     sides = ["front", "back"]
     test = list()
+    random_side = "back" if side == "front" else "front"
+    known_side = side
     for card_index in card_indices:
-        random_side = random.choice(sides)
-        known_side  = "back" if random_side == "front" else "front"
+        if (side == ""):
+            random_side = random.choice(sides)
+            known_side  = "back" if random_side == "front" else "front"
 
         known_card = cards[card_index]
         random_fields = Field.objects.filter(deck = deck, side = known_side)
         correct_values = Value.objects.filter(card = known_card, field__in = random_fields)
         correct_values_arr = list()
         for value in correct_values:
-            correct_values_arr.extend(value.value.split(", "))
+            correct_values_arr.extend(re.split(', | 、 |\n', value.value))
 
         test.append(
             dict({
@@ -287,8 +294,6 @@ def createExam(request, deck_slug):
     serializer = TestingSerializer(test, many=True)
     return Response(serializer.data)
         
-
-
 @api_view(["GET"])
 @authentication_classes([authentication.TokenAuthentication])
 @permission_classes([permissions.IsAuthenticated])
@@ -302,6 +307,18 @@ def createTest(request, deck_slug, cards_number):
     serializer = TestingSerializer(test, many=True)
     return Response(serializer.data)
 
+@api_view(["GET"])
+@authentication_classes([authentication.TokenAuthentication])
+@permission_classes([permissions.IsAuthenticated])
+def createTestOneSide(request, deck_slug, cards_number, side):
+    QUESTIONS_NUMBER = 100
+    deck = Deck.objects.get(slug = deck_slug)
+    cards  = Card.objects.filter(deck__slug = deck_slug).order_by("-id")[:cards_number][::-1]
+    indices = list(range(cards_number))
+    random.shuffle(indices)
+    test = generateTest(deck, cards, indices[0:QUESTIONS_NUMBER], "front" if side == 1 else "back")
+    serializer = TestingSerializer(test, many=True)
+    return Response(serializer.data)
 
 @api_view(["GET"])
 @authentication_classes([authentication.TokenAuthentication])
@@ -317,5 +334,22 @@ def createQuest(request, deck_slug, cards_number, questions_limit):
     indices = list(range(cards_number))
     random.shuffle(indices)
     test = generateQuest(deck, cards, indices[0:questions_number])
+    serializer = QuestSerializer(test, many=True)
+    return Response(serializer.data)
+
+@api_view(["GET"])
+@authentication_classes([authentication.TokenAuthentication])
+@permission_classes([permissions.IsAuthenticated])
+def createQuestOneSide(request, deck_slug, cards_number, questions_limit, side):
+    questions_number = questions_limit
+    deck = Deck.objects.get(slug = deck_slug)
+
+    if (questions_number == 0):
+        questions_number = deck.cards_number()
+
+    cards  = Card.objects.filter(deck__slug = deck_slug).order_by("-id")[:cards_number][::-1]
+    indices = list(range(cards_number))
+    random.shuffle(indices)
+    test = generateQuest(deck, cards, indices[0:questions_number], "front" if side == 1 else "back")
     serializer = QuestSerializer(test, many=True)
     return Response(serializer.data)

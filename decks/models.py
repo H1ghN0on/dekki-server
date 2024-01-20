@@ -25,6 +25,9 @@ class Deck(models.Model):
 
 class Field(models.Model):
 
+    class Meta:
+        ordering = ["id"]
+
     class DeckSide(models.TextChoices):
         FACE = 'front', 'front'
         BACK = 'back', 'back'
@@ -44,12 +47,20 @@ class Field(models.Model):
         return self.name
 
 class Card(models.Model):
+
+    class Meta:
+        ordering = ["id"]
+
     deck = models.ForeignKey(Deck, related_name="cards", on_delete=models.CASCADE)
 
     def __str__(self):
         return "Карта " + str(self.id)
 
 class Value(models.Model):
+
+    class Meta:
+        ordering = ["id"]
+
     field = models.ForeignKey(Field, related_name="values", on_delete=models.CASCADE)
     card = models.ForeignKey(Card, related_name="values", on_delete=models.CASCADE)
     value = models.TextField(blank = True)
